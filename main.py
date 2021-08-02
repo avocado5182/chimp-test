@@ -1,5 +1,6 @@
 from tkinter import *
 import tkinter as tk
+import tkinter.font as font
 
 import numpy as np
 
@@ -8,9 +9,9 @@ window = Tk()
 GRID_WIDTH = 10
 GRID_HEIGHT = 5
 
-SQUARE_SIZE = 2
+SQUARE_SIZE = 5
 
-DIGITS = 9
+DIGITS = 12
 
 score_frame = Frame(master=window, relief=tk.RIDGE)
 score_frame.pack()
@@ -26,7 +27,8 @@ score_label.pack()
 grid_frame = Frame(
     master=window,
     width=GRID_WIDTH * SQUARE_SIZE,
-    height=GRID_HEIGHT * SQUARE_SIZE
+    height=GRID_HEIGHT * SQUARE_SIZE,
+    bg="black"
 )
 
 grid_frame.columnconfigure("all", weight=1)
@@ -48,6 +50,7 @@ def button_onclick(event):
     # https://stackoverflow.com/a/13149770
     number_pressed = int(list(buttons.keys())[list(buttons.values()).index(widget)])
     numbers_pressed.append(number_pressed)
+    print(f"number pressed: {number_pressed}")
     if verify_numbers_pressed(numbers_pressed):
         print("good job")
         if number_pressed == 1:
@@ -60,18 +63,17 @@ def button_onclick(event):
         # reset
         print("bad job")
         quit(0)
-    print(f"number pressed: {number_pressed}")
 
 
 # game functions
 
 def get_random_indexes(no_of_indexes, minimum, maximum):
+    # most of this is re-randomizing if duplicates are present
     to_return = np.random.randint(minimum, maximum, no_of_indexes)
     unique = np.unique(to_return, return_counts=True)
-    print(f"to_return: {to_return}")
-    print(f"unique: {unique}")
-    print(f"unique[1]: {unique[1]}")
-    print(f"all(n == 1 for n in unique[1]): {all(n == 1 for n in unique[1])}")
+    # print(f"to_return: {to_return}")
+    # print(f"unique[1]: {unique[1]}")
+    # print(f"all(n == 1 for n in unique[1]): {all(n == 1 for n in unique[1])}")
     if not all(n == 1 for n in unique[1]):
         return get_random_indexes(no_of_indexes, minimum, maximum)
     else:
@@ -101,6 +103,8 @@ indexes = get_random_indexes(DIGITS, 0, (GRID_WIDTH * GRID_HEIGHT) - 1)
 print(indexes)
 
 curr_num = 1
+
+myFont = font.Font(size=10, weight="bold")
 for i in range(0, GRID_WIDTH):
     for j in range(0, GRID_HEIGHT):
         index = (i * GRID_HEIGHT) + j
@@ -111,10 +115,14 @@ for i in range(0, GRID_WIDTH):
                 width=GRID_WIDTH,
                 height=GRID_HEIGHT,
                 text=f"{button_index}",
-                cursor="hand2"
+                cursor="hand2",
+                bg="white",
+                fg="black"
             )
+            button["font"] = myFont
             buttons[button_index] = button
-            button.grid(row=j, column=i, sticky="ew")
+            padding = 3
+            button.grid(row=j, column=i, sticky="ew", padx=padding, pady=padding)
             button.bind("<Button-1>", button_onclick)
 
 window.mainloop()
